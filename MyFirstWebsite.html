@@ -141,7 +141,7 @@
 
     <!-- Data Visualization -->
     <div class="card">
-      <h3>Sensor Trends</h3>
+      <h3>Sensor Trends & Predictions</h3>
       <canvas id="sensorChart"></canvas>
     </div>
   </div>
@@ -157,7 +157,8 @@
         datasets: [
           { label: 'Temperature (°C)', data: [], borderColor: 'red', fill: false },
           { label: 'Moisture (%)', data: [], borderColor: 'blue', fill: false },
-          { label: 'Light (lx)', data: [], borderColor: 'orange', fill: false }
+          { label: 'Light (lx)', data: [], borderColor: 'orange', fill: false },
+          { label: 'Predicted Moisture (%)', data: [], borderColor: 'green', borderDash: [5,5], fill: false }
         ]
       },
       options: {
@@ -193,6 +194,17 @@
       sensorChart.data.datasets[0].data.push(temp);
       sensorChart.data.datasets[1].data.push(moisture);
       sensorChart.data.datasets[2].data.push(light);
+
+      // Predictive analytics: simple linear forecast for moisture
+      if (sensorChart.data.datasets[1].data.length > 5) {
+        const recent = sensorChart.data.datasets[1].data.slice(-5).map(Number);
+        const avgDrop = (recent[0] - recent[recent.length-1]) / recent.length;
+        const prediction = Number(moisture) - avgDrop * 3; // forecast 3 steps ahead
+        sensorChart.data.datasets[3].data.push(prediction.toFixed(0));
+      } else {
+        sensorChart.data.datasets[3].data.push(null);
+      }
+
       sensorChart.update();
     }
     setInterval(updateSensors, 3000);
