@@ -2,122 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dark Mode Calculator</title>
+  <title>Modern Farming Game</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #2e7d32, #1b5e20);
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: #121212;
-      color: #fff;
     }
-    .calculator {
-      background: #1e1e1e;
+    .game-container {
+      background: #263238;
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      width: 280px;
+      width: 350px;
+      text-align: center;
     }
-    #display {
-      width: 100%;
-      height: 60px;
-      font-size: 1.6em;
-      text-align: right;
-      margin-bottom: 15px;
-      padding: 10px;
-      border: none;
+    h1 {
+      margin-bottom: 20px;
+      color: #aed581;
+    }
+    .field {
+      margin: 20px 0;
+      padding: 20px;
+      background: #37474f;
       border-radius: 10px;
-      background: #2a2a2a;
-      color: #00ffcc;
     }
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+    .progress-bar {
+      width: 100%;
+      background: #455a64;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress {
+      height: 20px;
+      width: 0%;
+      background: #ffeb3b;
+      transition: width 0.3s;
     }
     button {
-      padding: 18px;
-      font-size: 1.2em;
+      padding: 10px 15px;
+      margin: 10px;
       border: none;
-      border-radius: 10px;
-      background: #2a2a2a;
-      color: #fff;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      font-size: 1em;
+      transition: background 0.2s;
     }
-    button:hover {
-      background: #00ffcc;
-      color: #000;
+    .plant {
+      background: #4caf50;
+      color: #fff;
     }
-    .operator {
-      background: #ff4081;
+    .plant:hover {
+      background: #388e3c;
     }
-    .operator:hover {
-      background: #e91e63;
+    .harvest {
+      background: #ff9800;
+      color: #fff;
     }
-    .equal {
-      grid-column: span 2;
-      background: #00c853;
+    .harvest:hover {
+      background: #e65100;
     }
-    .equal:hover {
-      background: #009624;
-    }
-    .clear {
-      background: #ff3d00;
-    }
-    .clear:hover {
-      background: #dd2c00;
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #fff176;
     }
   </style>
 </head>
 <body>
-  <div class="calculator">
-    <input type="text" id="display" disabled>
-    <div class="buttons">
-      <button class="clear" onclick="clearDisplay()">C</button>
-      <button onclick="deleteLast()">⌫</button>
-      <button class="operator" onclick="appendValue('/')">÷</button>
-      <button class="operator" onclick="appendValue('*')">×</button>
-
-      <button onclick="appendValue('7')">7</button>
-      <button onclick="appendValue('8')">8</button>
-      <button onclick="appendValue('9')">9</button>
-      <button class="operator" onclick="appendValue('-')">−</button>
-
-      <button onclick="appendValue('4')">4</button>
-      <button onclick="appendValue('5')">5</button>
-      <button onclick="appendValue('6')">6</button>
-      <button class="operator" onclick="appendValue('+')">+</button>
-
-      <button onclick="appendValue('1')">1</button>
-      <button onclick="appendValue('2')">2</button>
-      <button onclick="appendValue('3')">3</button>
-      <button onclick="appendValue('.')">.</button>
-
-      <button onclick="appendValue('0')">0</button>
-      <button class="equal" onclick="calculate()">=</button>
+  <div class="game-container">
+    <h1>🌱 Farming Game</h1>
+    <div class="field">
+      <p>Crop Field</p>
+      <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+      </div>
     </div>
+    <button class="plant" onclick="plantCrop()">Plant</button>
+    <button class="harvest" onclick="harvestCrop()">Harvest</button>
+    <div id="status">No crop planted yet.</div>
   </div>
 
   <script>
-    function appendValue(val) {
-      document.getElementById('display').value += val;
+    let growth = 0;
+    let growing = false;
+    let interval;
+
+    function plantCrop() {
+      if (!growing) {
+        growth = 0;
+        document.getElementById('progress').style.width = '0%';
+        document.getElementById('status').innerText = 'Crop planted! Growing...';
+        growing = true;
+        interval = setInterval(() => {
+          if (growth < 100) {
+            growth += 10;
+            document.getElementById('progress').style.width = growth + '%';
+          } else {
+            document.getElementById('status').innerText = 'Crop is ready to harvest!';
+            clearInterval(interval);
+          }
+        }, 1000);
+      }
     }
-    function clearDisplay() {
-      document.getElementById('display').value = '';
-    }
-    function deleteLast() {
-      let current = document.getElementById('display').value;
-      document.getElementById('display').value = current.slice(0, -1);
-    }
-    function calculate() {
-      try {
-        let result = eval(document.getElementById('display').value);
-        document.getElementById('display').value = result;
-      } catch {
-        document.getElementById('display').value = 'Error';
+
+    function harvestCrop() {
+      if (growth === 100) {
+        document.getElementById('status').innerText = 'You harvested the crop! 🌾';
+        document.getElementById('progress').style.width = '0%';
+        growing = false;
+      } else {
+        document.getElementById('status').innerText = 'Crop not ready yet!';
       }
     }
   </script>
