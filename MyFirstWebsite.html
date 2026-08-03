@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Modern Farming Game</title>
+  <title>Farming Game with Shop</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #2e7d32, #1b5e20);
+      background: linear-gradient(to right, #4caf50, #2e7d32);
       color: #fff;
       display: flex;
       justify-content: center;
@@ -18,16 +18,16 @@
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      width: 350px;
+      width: 500px;
       text-align: center;
     }
     h1 {
       margin-bottom: 20px;
       color: #aed581;
     }
-    .field {
-      margin: 20px 0;
-      padding: 20px;
+    .field, .shop, .upgrades {
+      margin: 15px 0;
+      padding: 15px;
       background: #37474f;
       border-radius: 10px;
     }
@@ -45,79 +45,143 @@
       transition: width 0.3s;
     }
     button {
-      padding: 10px 15px;
-      margin: 10px;
+      padding: 8px 12px;
+      margin: 5px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 1em;
+      font-size: 0.9em;
       transition: background 0.2s;
     }
-    .plant {
-      background: #4caf50;
-      color: #fff;
-    }
-    .plant:hover {
-      background: #388e3c;
-    }
-    .harvest {
-      background: #ff9800;
-      color: #fff;
-    }
-    .harvest:hover {
-      background: #e65100;
-    }
-    #status {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #fff176;
+    .plant { background: #4caf50; color: #fff; }
+    .plant:hover { background: #388e3c; }
+    .harvest { background: #ff9800; color: #fff; }
+    .harvest:hover { background: #e65100; }
+    .buy { background: #2196f3; color: #fff; }
+    .buy:hover { background: #1976d2; }
+    #inventory, #coins {
+      margin-top: 20px;
+      padding: 10px;
+      background: #455a64;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
   <div class="game-container">
-    <h1>🌱 Farming Game</h1>
-    <div class="field">
-      <p>Crop Field</p>
-      <div class="progress-bar">
-        <div class="progress" id="progress"></div>
-      </div>
+    <h1>🌱 Farming Game with Shop</h1>
+    <div id="coins">Coins: 100</div>
+
+    <!-- Fields -->
+    <div class="field" id="spinachField">
+      <p>Spinach Field</p>
+      <div class="progress-bar"><div class="progress" id="spinachProgress"></div></div>
+      <button class="plant" onclick="plantCrop('spinach')">Plant Spinach</button>
+      <button class="harvest" onclick="harvestCrop('spinach', 20)">Harvest Spinach (+20 coins)</button>
     </div>
-    <button class="plant" onclick="plantCrop()">Plant</button>
-    <button class="harvest" onclick="harvestCrop()">Harvest</button>
-    <div id="status">No crop planted yet.</div>
+
+    <div class="field" id="eggplantField">
+      <p>Eggplant Field</p>
+      <div class="progress-bar"><div class="progress" id="eggplantProgress"></div></div>
+      <button class="plant" onclick="plantCrop('eggplant')">Plant Eggplant</button>
+      <button class="harvest" onclick="harvestCrop('eggplant', 30)">Harvest Eggplant (+30 coins)</button>
+    </div>
+
+    <!-- Inventory -->
+    <div id="inventory">
+      <h3>Inventory</h3>
+      <p id="inventoryList">Empty</p>
+    </div>
+
+    <!-- Shop -->
+    <div class="shop">
+      <h3>Shop</h3>
+      <button class="buy" onclick="buyItem('spinachSeed', 10)">Buy Spinach Seed (10 coins)</button>
+      <button class="buy" onclick="buyItem('eggplantSeed', 15)">Buy Eggplant Seed (15 coins)</button>
+      <button class="buy" onclick="buyItem('fertilizer', 25)">Buy Fertilizer (25 coins)</button>
+    </div>
+
+    <!-- Upgrades -->
+    <div class="upgrades">
+      <h3>Upgrades</h3>
+      <button class="buy" onclick="buyUpgrade('fastGrowth', 50)">Faster Growth (50 coins)</button>
+      <button class="buy" onclick="buyUpgrade('doubleHarvest', 75)">Double Harvest (75 coins)</button>
+      <p id="upgradeStatus">No upgrades purchased.</p>
+    </div>
   </div>
 
   <script>
-    let growth = 0;
-    let growing = false;
-    let interval;
+    let crops = {
+      spinach: {growth: 0, growing: false, interval: null},
+      eggplant: {growth: 0, growing: false, interval: null}
+    };
+    let inventory = [];
+    let coins = 100;
+    let growthSpeed = 1000;
+    let doubleHarvest = false;
 
-    function plantCrop() {
-      if (!growing) {
-        growth = 0;
-        document.getElementById('progress').style.width = '0%';
-        document.getElementById('status').innerText = 'Crop planted! Growing...';
-        growing = true;
-        interval = setInterval(() => {
-          if (growth < 100) {
-            growth += 10;
-            document.getElementById('progress').style.width = growth + '%';
+    function updateCoins() {
+      document.getElementById('coins').innerText = 'Coins: ' + coins;
+    }
+
+    function plantCrop(type) {
+      if (!crops[type].growing) {
+        crops[type].growth = 0;
+        document.getElementById(type + 'Progress').style.width = '0%';
+        crops[type].growing = true;
+        crops[type].interval = setInterval(() => {
+          if (crops[type].growth < 100) {
+            crops[type].growth += 10;
+            document.getElementById(type + 'Progress').style.width = crops[type].growth + '%';
           } else {
-            document.getElementById('status').innerText = 'Crop is ready to harvest!';
-            clearInterval(interval);
+            clearInterval(crops[type].interval);
           }
-        }, 1000);
+        }, growthSpeed);
       }
     }
 
-    function harvestCrop() {
-      if (growth === 100) {
-        document.getElementById('status').innerText = 'You harvested the crop! 🌾';
-        document.getElementById('progress').style.width = '0%';
-        growing = false;
+    function harvestCrop(type, reward) {
+      if (crops[type].growth === 100) {
+        inventory.push(type);
+        updateInventory();
+        coins += doubleHarvest ? reward * 2 : reward;
+        updateCoins();
+        document.getElementById(type + 'Progress').style.width = '0%';
+        crops[type].growing = false;
+        crops[type].growth = 0;
       } else {
-        document.getElementById('status').innerText = 'Crop not ready yet!';
+        alert(type.charAt(0).toUpperCase() + type.slice(1) + " not ready yet!");
+      }
+    }
+
+    function updateInventory() {
+      document.getElementById('inventoryList').innerText = inventory.length ? inventory.join(', ') : 'Empty';
+    }
+
+    function buyItem(item, cost) {
+      if (coins >= cost) {
+        coins -= cost;
+        updateCoins();
+        inventory.push(item);
+        updateInventory();
+      } else {
+        alert("Not enough coins to buy " + item);
+      }
+    }
+
+    function buyUpgrade(type, cost) {
+      if (coins >= cost) {
+        coins -= cost;
+        updateCoins();
+        if (type === 'fastGrowth') {
+          growthSpeed = 500;
+          document.getElementById('upgradeStatus').innerText = 'Faster Growth Active!';
+        } else if (type === 'doubleHarvest') {
+          doubleHarvest = true;
+          document.getElementById('upgradeStatus').innerText = 'Double Harvest Active!';
+        }
+      } else {
+        alert("Not enough coins for upgrade!");
       }
     }
   </script>
