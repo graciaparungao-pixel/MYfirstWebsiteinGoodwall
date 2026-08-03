@@ -79,7 +79,6 @@
       color: white;
       font-size: 0.9rem;
     }
-    /* Responsive layout */
     @media (max-width: 900px) {
       .container {
         grid-template-columns: 1fr;
@@ -93,17 +92,17 @@
     <!-- Environment Stats -->
     <div class="card">
       <h3>Environment Stats</h3>
-      <div class="status"><span>Temperature:</span> 72°F (Optimal)</div>
-      <div class="status"><span>Soil Moisture:</span> 58% (Normal)</div>
-      <div class="status"><span>Light Level:</span> 6400 lx (Full Sun)</div>
-      <div class="status"><span>Water Tank:</span> 75% (Sufficient)</div>
+      <div class="status"><span>Temperature:</span> <span id="temp">--</span></div>
+      <div class="status"><span>Soil Moisture:</span> <span id="moisture">--</span></div>
+      <div class="status"><span>Light Level:</span> <span id="light">--</span></div>
+      <div class="status"><span>Water Tank:</span> <span id="tank">--</span></div>
     </div>
 
     <!-- Garden Overview -->
     <div class="card overview">
       <h3>Garden Overview</h3>
       <img src="smart_garden_ui.jpg" alt="Garden Overview">
-      <p>Irrigation Active • Nutrient Dispensing • Auto Harvesting</p>
+      <p id="automation">Awaiting sensor data...</p>
     </div>
 
     <!-- Tasks -->
@@ -142,6 +141,28 @@
   <footer>© 2026 Smart Garden Interface by Gracia</footer>
 
   <script>
+    // Simulated real-time sensor data
+    function updateSensors() {
+      const temp = (20 + Math.random() * 10).toFixed(1) + " °C";
+      const moisture = (40 + Math.random() * 20).toFixed(0) + "%";
+      const light = (5000 + Math.random() * 2000).toFixed(0) + " lx";
+      const tank = (60 + Math.random() * 20).toFixed(0) + "%";
+
+      document.getElementById("temp").innerText = temp;
+      document.getElementById("moisture").innerText = moisture;
+      document.getElementById("light").innerText = light;
+      document.getElementById("tank").innerText = tank;
+
+      // Automation logic
+      let automation = [];
+      if (parseInt(moisture) < 50) automation.push("Irrigation Active");
+      if (parseInt(tank) < 70) automation.push("Refill Water Tank Soon");
+      automation.push("Nutrient Dispensing");
+      document.getElementById("automation").innerText = automation.join(" • ");
+    }
+    setInterval(updateSensors, 3000); // update every 3 seconds
+
+    // Interactive controls
     function toggleIrrigation(state) {
       document.getElementById("irrigation-status").innerText = 
         "Status: " + (state ? "ON" : "OFF");
