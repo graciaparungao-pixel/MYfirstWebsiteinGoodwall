@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Garden Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -101,7 +102,7 @@
     <!-- Garden Overview -->
     <div class="card overview">
       <h3>Garden Overview</h3>
-      <img src="smart.png" alt="Garden Overview">
+      <img src="smart_garden_ui.jpg" alt="Garden Overview">
       <p id="automation">Awaiting sensor data...</p>
     </div>
 
@@ -113,7 +114,7 @@
         <li>Check for Pests</li>
         <li>Fertilize Herb Garden</li>
         <li>Inspect Solar Panels</li>
-      </ul>smart_garden_ui
+      </ul>
     </div>
 
     <!-- Interactive Controls -->
@@ -137,21 +138,48 @@
         <p id="light-status">Status: OFF</p>
       </div>
     </div>
+
+    <!-- Data Visualization -->
+    <div class="card">
+      <h3>Sensor Trends</h3>
+      <canvas id="sensorChart"></canvas>
+    </div>
   </div>
   <footer>© 2026 Smart Garden Interface by Gracia</footer>
 
   <script>
-    // Simulated real-time sensor data
-    function updateSensors() {
-      const temp = (20 + Math.random() * 10).toFixed(1) + " °C";
-      const moisture = (40 + Math.random() * 20).toFixed(0) + "%";
-      const light = (5000 + Math.random() * 2000).toFixed(0) + " lx";
-      const tank = (60 + Math.random() * 20).toFixed(0) + "%";
+    // Chart setup
+    const ctx = document.getElementById('sensorChart').getContext('2d');
+    const sensorChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          { label: 'Temperature (°C)', data: [], borderColor: 'red', fill: false },
+          { label: 'Moisture (%)', data: [], borderColor: 'blue', fill: false },
+          { label: 'Light (lx)', data: [], borderColor: 'orange', fill: false }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
 
-      document.getElementById("temp").innerText = temp;
-      document.getElementById("moisture").innerText = moisture;
-      document.getElementById("light").innerText = light;
-      document.getElementById("tank").innerText = tank;
+    // Simulated real-time sensor data
+    let time = 0;
+    function updateSensors() {
+      const temp = (20 + Math.random() * 10).toFixed(1);
+      const moisture = (40 + Math.random() * 20).toFixed(0);
+      const light = (5000 + Math.random() * 2000).toFixed(0);
+      const tank = (60 + Math.random() * 20).toFixed(0);
+
+      document.getElementById("temp").innerText = temp + " °C";
+      document.getElementById("moisture").innerText = moisture + "%";
+      document.getElementById("light").innerText = light + " lx";
+      document.getElementById("tank").innerText = tank + "%";
 
       // Automation logic
       let automation = [];
@@ -159,8 +187,15 @@
       if (parseInt(tank) < 70) automation.push("Refill Water Tank Soon");
       automation.push("Nutrient Dispensing");
       document.getElementById("automation").innerText = automation.join(" • ");
+
+      // Update chart
+      sensorChart.data.labels.push(time++);
+      sensorChart.data.datasets[0].data.push(temp);
+      sensorChart.data.datasets[1].data.push(moisture);
+      sensorChart.data.datasets[2].data.push(light);
+      sensorChart.update();
     }
-    setInterval(updateSensors, 3000); // update every 3 seconds
+    setInterval(updateSensors, 3000);
 
     // Interactive controls
     function toggleIrrigation(state) {
