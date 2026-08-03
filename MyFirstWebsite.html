@@ -18,13 +18,10 @@
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      width: 600px;
+      width: 650px;
       text-align: center;
     }
-    h1 {
-      margin-bottom: 20px;
-      color: #aed581;
-    }
+    h1 { color: #aed581; }
     .section {
       margin: 15px 0;
       padding: 15px;
@@ -57,13 +54,15 @@
     .harvest { background: #ff9800; color: #fff; }
     .buy { background: #2196f3; color: #fff; }
     .sell { background: #9c27b0; color: #fff; }
-    #coins, #inventory { margin-top: 10px; }
+    #coins, #inventory, #level, #xp { margin-top: 10px; }
   </style>
 </head>
 <body>
   <div class="game-container">
     <h1>🌱 Mini Farming Simulator</h1>
     <div id="coins">Coins: 100</div>
+    <div id="level">Level: 1</div>
+    <div id="xp">XP: 0 / 100</div>
 
     <!-- Crop Fields -->
     <div class="section">
@@ -103,12 +102,10 @@
       <p id="upgradeStatus">No upgrades purchased.</p>
     </div>
 
-    <!-- Marketplace -->
+    <!-- Achievements -->
     <div class="section">
-      <h3>Marketplace</h3>
-      <button class="sell" onclick="sellCrop('spinach', 30)">Sell Spinach (+30 coins)</button>
-      <button class="sell" onclick="sellCrop('eggplant', 40)">Sell Eggplant (+40 coins)</button>
-      <button class="sell" onclick="tradeCrop('spinach','eggplant')">Trade Spinach for Eggplant</button>
+      <h3>Achievements</h3>
+      <p id="achievements">None yet.</p>
     </div>
   </div>
 
@@ -121,9 +118,23 @@
     let coins = 100;
     let growthSpeed = 1000;
     let doubleHarvest = false;
+    let xp = 0;
+    let level = 1;
+    let achievements = [];
 
     function updateCoins() {
       document.getElementById('coins').innerText = 'Coins: ' + coins;
+    }
+
+    function updateXP(amount) {
+      xp += amount;
+      if (xp >= 100) {
+        xp = 0;
+        level++;
+        document.getElementById('level').innerText = 'Level: ' + level;
+        unlockAchievement('Reached Level ' + level);
+      }
+      document.getElementById('xp').innerText = 'XP: ' + xp + ' / 100';
     }
 
     function plantCrop(type) {
@@ -148,9 +159,11 @@
         updateInventory();
         coins += doubleHarvest ? reward * 2 : reward;
         updateCoins();
+        updateXP(20);
         document.getElementById(type + 'Progress').style.width = '0%';
         crops[type].growing = false;
         crops[type].growth = 0;
+        unlockAchievement('Harvested ' + type);
       } else {
         alert(type + " not ready yet!");
       }
@@ -166,6 +179,7 @@
         updateCoins();
         inventory.push(item);
         updateInventory();
+        updateXP(10);
       } else {
         alert("Not enough coins to buy " + item);
       }
@@ -178,36 +192,23 @@
         if (type === 'fastGrowth') {
           growthSpeed = 500;
           document.getElementById('upgradeStatus').innerText = 'Faster Growth Active!';
+          unlockAchievement('Bought Faster Growth');
         } else if (type === 'doubleHarvest') {
           doubleHarvest = true;
           document.getElementById('upgradeStatus').innerText = 'Double Harvest Active!';
+          unlockAchievement('Bought Double Harvest');
         }
+        updateXP(15);
       } else {
         alert("Not enough coins for upgrade!");
       }
     }
 
-    function sellCrop(type, price) {
-      const index = inventory.indexOf(type);
-      if (index !== -1) {
-        inventory.splice(index, 1);
-        coins += price;
-        updateCoins();
-        updateInventory();
-      } else {
-        alert("You don't have any " + type + " to sell!");
-      }
-    }
-
-    function tradeCrop(fromType, toType) {
-      const index = inventory.indexOf(fromType);
-      if (index !== -1) {
-        inventory.splice(index, 1);
-        inventory.push(toType);
-        updateInventory();
-        alert("Traded " + fromType + " for " + toType + "!");
-      } else {
-        alert("You don't have any " + fromType + " to trade!");
+    function unlockAchievement(name) {
+      if (!achievements.includes(name)) {
+        achievements.push(name);
+        document.getElementById('achievements').innerText = achievements.join(', ');
+        alert("🎉 Achievement Unlocked: " + name);
       }
     }
   </script>
