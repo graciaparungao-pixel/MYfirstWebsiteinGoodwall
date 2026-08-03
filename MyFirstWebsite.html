@@ -18,14 +18,14 @@
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      width: 520px;
+      width: 550px;
       text-align: center;
     }
     h1 {
       margin-bottom: 20px;
       color: #aed581;
     }
-    .field, .shop, .upgrades {
+    .field, .shop, .upgrades, .marketplace {
       margin: 15px 0;
       padding: 15px;
       background: #37474f;
@@ -41,8 +41,8 @@
     .progress {
       height: 20px;
       width: 0%;
-      background: #ffeb3b;
-      transition: width 0.3s;
+      background: linear-gradient(90deg, #ffeb3b, #fbc02d);
+      transition: width 0.5s ease;
     }
     button {
       padding: 8px 12px;
@@ -59,6 +59,8 @@
     .harvest:hover { background: #e65100; }
     .buy { background: #2196f3; color: #fff; }
     .buy:hover { background: #1976d2; }
+    .sell { background: #9c27b0; color: #fff; }
+    .sell:hover { background: #7b1fa2; }
     #inventory, #coins {
       margin-top: 20px;
       padding: 10px;
@@ -108,6 +110,14 @@
       <button class="buy" onclick="buyUpgrade('doubleHarvest', 75)">Double Harvest (75 coins)</button>
       <p id="upgradeStatus">No upgrades purchased.</p>
     </div>
+
+    <!-- Marketplace -->
+    <div class="marketplace">
+      <h3>Marketplace</h3>
+      <button class="sell" onclick="sellCrop('spinach', 30)">Sell Spinach (+30 coins)</button>
+      <button class="sell" onclick="sellCrop('eggplant', 40)">Sell Eggplant (+40 coins)</button>
+      <button class="sell" onclick="tradeCrop('spinach', 'eggplant')">Trade Spinach for Eggplant</button>
+    </div>
   </div>
 
   <script>
@@ -133,6 +143,7 @@
           if (crops[type].growth < 100) {
             crops[type].growth += 10;
             document.getElementById(type + 'Progress').style.width = crops[type].growth + '%';
+            document.getElementById(type + 'Progress').style.background = `linear-gradient(90deg, #ffeb3b ${crops[type].growth}%, #fbc02d)`;
           } else {
             clearInterval(crops[type].interval);
           }
@@ -182,6 +193,30 @@
         }
       } else {
         alert("Not enough coins for upgrade!");
+      }
+    }
+
+    function sellCrop(type, price) {
+      const index = inventory.indexOf(type);
+      if (index !== -1) {
+        inventory.splice(index, 1);
+        coins += price;
+        updateCoins();
+        updateInventory();
+      } else {
+        alert("You don't have any " + type + " to sell!");
+      }
+    }
+
+    function tradeCrop(fromType, toType) {
+      const index = inventory.indexOf(fromType);
+      if (index !== -1) {
+        inventory.splice(index, 1);
+        inventory.push(toType);
+        updateInventory();
+        alert("Traded " + fromType + " for " + toType + "!");
+      } else {
+        alert("You don't have any " + fromType + " to trade!");
       }
     }
   </script>
