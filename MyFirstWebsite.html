@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Modern Farming Game</title>
+  <title>Mini Farming Simulator</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -18,14 +18,11 @@
       padding: 20px;
       border-radius: 15px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-      width: 550px;
+      width: 600px;
       text-align: center;
     }
-    h1 {
-      margin-bottom: 20px;
-      color: #aed581;
-    }
-    .field, .shop, .upgrades, .marketplace {
+    h1 { color: #aed581; }
+    .section {
       margin: 15px 0;
       padding: 15px;
       background: #37474f;
@@ -54,49 +51,41 @@
       transition: background 0.2s;
     }
     .plant { background: #4caf50; color: #fff; }
-    .plant:hover { background: #388e3c; }
     .harvest { background: #ff9800; color: #fff; }
-    .harvest:hover { background: #e65100; }
     .buy { background: #2196f3; color: #fff; }
-    .buy:hover { background: #1976d2; }
     .sell { background: #9c27b0; color: #fff; }
-    .sell:hover { background: #7b1fa2; }
-    #inventory, #coins {
-      margin-top: 20px;
-      padding: 10px;
-      background: #455a64;
-      border-radius: 10px;
-    }
+    #coins, #inventory { margin-top: 10px; }
   </style>
 </head>
 <body>
   <div class="game-container">
-    <h1>🌾 Modern Farming Game</h1>
+    <h1>🌱 Mini Farming Simulator</h1>
     <div id="coins">Coins: 100</div>
 
-    <!-- Fields -->
-    <div class="field" id="spinachField">
+    <!-- Crop Fields -->
+    <div class="section">
+      <h3>Crop Fields</h3>
       <p>Spinach Field</p>
       <div class="progress-bar"><div class="progress" id="spinachProgress"></div></div>
       <button class="plant" onclick="plantCrop('spinach')">Plant Spinach</button>
-      <button class="harvest" onclick="harvestCrop('spinach', 20)">Harvest Spinach (+20 coins)</button>
+      <button class="harvest" onclick="harvestCrop('spinach', 20)">Harvest (+20 coins)</button>
     </div>
 
-    <div class="field" id="eggplantField">
+    <div class="section">
       <p>Eggplant Field</p>
       <div class="progress-bar"><div class="progress" id="eggplantProgress"></div></div>
       <button class="plant" onclick="plantCrop('eggplant')">Plant Eggplant</button>
-      <button class="harvest" onclick="harvestCrop('eggplant', 30)">Harvest Eggplant (+30 coins)</button>
+      <button class="harvest" onclick="harvestCrop('eggplant', 30)">Harvest (+30 coins)</button>
     </div>
 
     <!-- Inventory -->
-    <div id="inventory">
+    <div class="section" id="inventory">
       <h3>Inventory</h3>
       <p id="inventoryList">Empty</p>
     </div>
 
     <!-- Shop -->
-    <div class="shop">
+    <div class="section">
       <h3>Shop</h3>
       <button class="buy" onclick="buyItem('spinachSeed', 10)">Buy Spinach Seed (10 coins)</button>
       <button class="buy" onclick="buyItem('eggplantSeed', 15)">Buy Eggplant Seed (15 coins)</button>
@@ -104,7 +93,7 @@
     </div>
 
     <!-- Upgrades -->
-    <div class="upgrades">
+    <div class="section">
       <h3>Upgrades</h3>
       <button class="buy" onclick="buyUpgrade('fastGrowth', 50)">Faster Growth (50 coins)</button>
       <button class="buy" onclick="buyUpgrade('doubleHarvest', 75)">Double Harvest (75 coins)</button>
@@ -112,11 +101,11 @@
     </div>
 
     <!-- Marketplace -->
-    <div class="marketplace">
+    <div class="section">
       <h3>Marketplace</h3>
       <button class="sell" onclick="sellCrop('spinach', 30)">Sell Spinach (+30 coins)</button>
       <button class="sell" onclick="sellCrop('eggplant', 40)">Sell Eggplant (+40 coins)</button>
-      <button class="sell" onclick="tradeCrop('spinach', 'eggplant')">Trade Spinach for Eggplant</button>
+      <button class="sell" onclick="tradeCrop('spinach','eggplant')">Trade Spinach for Eggplant</button>
     </div>
   </div>
 
@@ -143,7 +132,6 @@
           if (crops[type].growth < 100) {
             crops[type].growth += 10;
             document.getElementById(type + 'Progress').style.width = crops[type].growth + '%';
-            document.getElementById(type + 'Progress').style.background = `linear-gradient(90deg, #ffeb3b ${crops[type].growth}%, #fbc02d)`;
           } else {
             clearInterval(crops[type].interval);
           }
@@ -161,7 +149,7 @@
         crops[type].growing = false;
         crops[type].growth = 0;
       } else {
-        alert(type.charAt(0).toUpperCase() + type.slice(1) + " not ready yet!");
+        alert(type + " not ready yet!");
       }
     }
 
